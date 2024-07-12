@@ -25,7 +25,7 @@ namespace PassengerTrainConfigurator
 
             while (isRunning)
             {
-                ShowAllDirections();
+                ShowTrains();
 
                 Console.WriteLine($"Введите {CommandCreateTrain}, чтобы создать поезд.\n" +
                     $"Введите {CommandExit}, чтобы выйти.");
@@ -60,7 +60,7 @@ namespace PassengerTrainConfigurator
             Direction direction = CreateDirection();
             int passengers = SellT​tickets();
 
-            Train train = new Train(direction, passengers, CreateList(passengers));
+            Train train = new Train(direction, passengers, CreateRailwayCarriages(passengers));
             _trains.Add(train);
 
             Console.Clear();
@@ -114,25 +114,25 @@ namespace PassengerTrainConfigurator
             while (departurePoint == arrivalPoint);
         }
 
-        private void ShowAllDirections()
+        private void ShowTrains()
         {
             foreach (var train in _trains)
                 train.ShowStats();
         }
-        public List<RailwayCarriage> CreateList(int passengers)
+        private List<RailwayCarriage> CreateRailwayCarriages(int passengers)
         {
             List<RailwayCarriage> railwayCarriages = new List<RailwayCarriage>();
 
             RailwayCarriage railwayCarriage = new RailwayCarriage();
 
-            int numberRailwayCarriage = passengers / railwayCarriage.GetCapacity();
-            int remainderNumberRailwayCarriage = passengers % railwayCarriage.GetCapacity();
+            int numberRailwayCarriage = passengers / railwayCarriage.Capacity;
+            int remainderNumberRailwayCarriage = passengers % railwayCarriage.Capacity;
 
             if (remainderNumberRailwayCarriage > 0)
                 numberRailwayCarriage += 1;
 
             for (int i = 0; i < numberRailwayCarriage; i++)
-                railwayCarriages.Add(railwayCarriage);
+                railwayCarriages.Add(new RailwayCarriage());
 
             return railwayCarriages;
         }
@@ -163,10 +163,7 @@ namespace PassengerTrainConfigurator
     {
         private int _capacity = 50;
 
-        public int GetCapacity()
-        {
-            return _capacity;
-        }
+        public int Capacity => _capacity;
     }
 
     class Direction
