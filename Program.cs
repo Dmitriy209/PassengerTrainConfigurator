@@ -14,7 +14,7 @@ namespace PassengerTrainConfigurator
 
     class Dispatcher
     {
-        List<Train> trains = new List<Train>();
+        private List<Train> _trains = new List<Train>();
 
         public void Work()
         {
@@ -60,8 +60,8 @@ namespace PassengerTrainConfigurator
             Direction direction = CreateDirection();
             int passengers = SellT​tickets();
 
-            Train train = new Train(direction, passengers);
-            trains.Add(train);
+            Train train = new Train(direction, passengers, CreateList(passengers));
+            _trains.Add(train);
 
             Console.Clear();
 
@@ -85,49 +85,45 @@ namespace PassengerTrainConfigurator
             string commandExit = "1";
             string userInput;
 
-            string pointOfDeparture;
+            string departurePoint;
             string arrivalPoint;
 
             do
             {
-                Console.WriteLine("Введите точку отправления поезда:");
-                pointOfDeparture = Console.ReadLine();
+                ReadCorrectPoint(out departurePoint, out arrivalPoint);
 
-                Console.WriteLine("Введите точку прибытия поезда:");
-                arrivalPoint = Console.ReadLine();
-
-                Console.WriteLine($"Поезд отправляется из {pointOfDeparture} в {arrivalPoint}\n" +
+                Console.WriteLine($"Поезд отправляется из {departurePoint} в {arrivalPoint}\n" +
                     $"Если данные введены верно, нажмите {commandExit}");
                 userInput = Console.ReadLine();
             }
             while (commandExit != userInput);
 
-            return new Direction(pointOfDeparture, arrivalPoint);
+            return new Direction(departurePoint, arrivalPoint);
+        }
+
+        private void ReadCorrectPoint(out string departurePoint, out string arrivalPoint)
+        {
+            do
+            {
+                Console.WriteLine("Введите точку отправления поезда:");
+                departurePoint = Console.ReadLine();
+
+                Console.WriteLine("Введите точку прибытия поезда:");
+                arrivalPoint = Console.ReadLine();
+            }
+            while (departurePoint == arrivalPoint);
         }
 
         private void ShowAllDirections()
         {
-            foreach (var train in trains)
+            foreach (var train in _trains)
                 train.ShowStats();
         }
-    }
-
-    class Train
-    {
-        private Direction _direction;
-        private int _passengers;
-        private List<railwayCarriage> _railwayCarriages;
-
-        public Train(Direction direction, int passengers)
+        public List<RailwayCarriage> CreateList(int passengers)
         {
-            _direction = direction;
-            _passengers = passengers;
-            _railwayCarriages = CreateList(_passengers);
-        }
+            List<RailwayCarriage> railwayCarriages = new List<RailwayCarriage>();
 
-        private List<railwayCarriage> CreateList(int passengers)
-        {
-            List<railwayCarriage> railwayCarriages = new List<railwayCarriage>();
+            RailwayCarriage railwayCarriage = new RailwayCarriage();
 
             int numberRailwayCarriage = passengers / railwayCarriage.GetCapacity();
             int remainderNumberRailwayCarriage = passengers % railwayCarriage.GetCapacity();
@@ -136,9 +132,23 @@ namespace PassengerTrainConfigurator
                 numberRailwayCarriage += 1;
 
             for (int i = 0; i < numberRailwayCarriage; i++)
-                railwayCarriages.Add(new railwayCarriage());
+                railwayCarriages.Add(railwayCarriage);
 
             return railwayCarriages;
+        }
+    }
+
+    class Train
+    {
+        private Direction _direction;
+        private int _passengers;
+        private List<RailwayCarriage> _railwayCarriages;
+
+        public Train(Direction direction, int passengers, List<RailwayCarriage> railwayCarriages)
+        {
+            _direction = direction;
+            _passengers = passengers;
+            _railwayCarriages = railwayCarriages;
         }
 
         public void ShowStats()
@@ -149,11 +159,11 @@ namespace PassengerTrainConfigurator
         }
     }
 
-    class railwayCarriage
+    class RailwayCarriage
     {
-        private static int _capacity = 50;
+        private int _capacity = 50;
 
-        public static int GetCapacity()
+        public int GetCapacity()
         {
             return _capacity;
         }
@@ -161,18 +171,18 @@ namespace PassengerTrainConfigurator
 
     class Direction
     {
-        private string _pointOfDeparture;
+        private string _departurePoint;
         private string _arrivalPoint;
 
-        public Direction(string pointOfDeparture, string arrivalPoint)
+        public Direction(string departurePoint, string arrivalPoint)
         {
-            _pointOfDeparture = pointOfDeparture;
+            _departurePoint = departurePoint;
             _arrivalPoint = arrivalPoint;
         }
 
         public void ShowStats()
         {
-            Console.WriteLine($"Поезд отправляется из {_pointOfDeparture} в {_arrivalPoint}");
+            Console.WriteLine($"Поезд отправляется из {_departurePoint} в {_arrivalPoint}");
         }
     }
 
